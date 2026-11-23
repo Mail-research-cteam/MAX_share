@@ -561,7 +561,6 @@
     ['payLegal', 'payLegal', 'Текст внизу окна', 'Это демонстрация оформления. Оплата не проводится.'],
     ['successTitle', 'paySuccessTitle', 'Заголовок после оплаты', 'Оплачено'],
     ['successText', 'paySuccessNote', 'Описание после оплаты', 'Демонстрационный платёж завершён'],
-    ['doneTpl', 'payDoneNote', 'Уведомление после оплаты', 'Тестовый заказ оформлен'],
   ];
 
   function fill(text, n) {
@@ -570,6 +569,7 @@
 
   function renderPayment(n) {
     $('#payPrice').textContent = n.price || '';
+    $('#payDoneNote').textContent = fill(n.doneTpl ?? 'Тестовый заказ оформлен', n);
     for (const [field, id, , fallback] of paymentCopy) {
       $('#'+id).textContent = fill(n[field] ?? fallback, n);
     }
@@ -1112,6 +1112,7 @@
     if (kind === 'payment') {
       o.price = n.price || '100 ₽'; o.members = n.members || '10';
       o.successDelay = milliseconds(n.successDelay,6000);
+      if (n.doneTpl != null) o.doneTpl = n.doneTpl;
       for (const [field, , , fallback] of paymentCopy) o[field] = n[field] ?? fallback;
     }
     S.nodes[id] = o;
