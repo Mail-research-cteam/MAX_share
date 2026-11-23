@@ -11,6 +11,7 @@ vm.runInNewContext(fs.readFileSync(__dirname + '/preview.cjs', 'utf8'), {
 });
 (async () => {
   for (const [url, expected] of [
+    ['/',200],
     ['/prototype/index.html',200],
     ['/prototype/scenarios/demo.json',200],
     ['/prototype/assets/demo-avatar.svg',200],
