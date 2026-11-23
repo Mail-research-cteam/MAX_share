@@ -522,6 +522,7 @@
       personChat = null; botTrail = null; activeChat = 'bot';
     }
     renderChrome();
+    if (payNode && S.nodes[payNode]?.type==='payment') renderPayment(S.nodes[payNode]);
     if (!trail.length) restart(); else renderFeed();
   }
 
@@ -552,22 +553,34 @@
   }
 
   /* ── окно оплаты ──────────────────────────────────────────────────── */
-  // Цена и количество участников живут на узле и подставляются в оба
-  // состояния: в блок цены и кнопку чекаута, в тост успеха.
-  function fill(tplStr, n) {
-    return String(tplStr || '')
-      .replace(/\{price\}/g, n.price || '')
-      .replace(/\{members\}/g, n.members || '');
+  var paymentCopy = [
+    ['title', 'payTitle', 'Заголовок чекаута', 'Демонстрационная оплата'],
+    ['noteTpl', 'payNote', 'Описание под ценой', 'Тестовый заказ'],
+    ['payLabel', 'payButtonLabel', 'Текст кнопки', 'Подключить за {price}'],
+    ['payConsent', 'payConsent', 'Подпись под кнопкой', 'Деньги не списываются'],
+    ['payLegal', 'payLegal', 'Текст внизу окна', 'Это демонстрация оформления. Оплата не проводится.'],
+    ['successTitle', 'paySuccessTitle', 'Заголовок после оплаты', 'Оплачено'],
+    ['successText', 'paySuccessNote', 'Описание после оплаты', 'Демонстрационный платёж завершён'],
+    ['doneTpl', 'payDoneNote', 'Уведомление после оплаты', 'Тестовый заказ оформлен'],
+  ];
+
+  function fill(text, n) {
+    return text.replace(/\{(price|members)\}/g, (_, key) => n[key] || '');
   }
+
+  function renderPayment(n) {
+    $('#payPrice').textContent = n.price || '';
+    for (const [field, id, , fallback] of paymentCopy) {
+      $('#'+id).textContent = fill(n[field] ?? fallback, n);
+    }
+  }
+
   function openPay(id) {
     payOpener = document.activeElement;
     var n = S.nodes[id]; if (!n) return;
     payNode = id;
     clearTimeout(payTimer);
-    $('#payPrice').textContent = n.price || '';
-    $('#payBtnPrice').textContent = n.price || '';
-    $('#payNote').textContent = fill(n.noteTpl, n);
-    $('#payDoneNote').textContent = fill(n.doneTpl, n);
+    renderPayment(n);
     $('#payCard').classList.remove('is-paid');
     setMethod('card');
     $('#payOverlay').classList.add('is-open');
@@ -610,7 +623,7 @@
     if($('#payCard').classList.contains('is-paid'))return;
     var n = S.nodes[payNode]; if (!n) return;
     $('#payCard').classList.add('is-paid');
-    var next = n.auto, wait = milliseconds(n.successDelay,6000);
+    var wait = milliseconds(n.successDelay,6000);
     payTimer = setTimeout(function () { closePay(); }, wait);
   }
 
@@ -791,9 +804,9 @@
       var pn = S.nodes[id];
       h += fld('Цена', 'nodes.' + id + '.price', pn.price) +
         fld('Участников', 'nodes.' + id + '.members', pn.members) +
-        '<div class="fl-note">Цена и количество подставляются в оба состояния — ' +
-        'в блок цены и кнопку чекаута и в сообщение на экране успеха. ' +
-        'Остальное зафиксировано по макету.</div>';
+        paymentCopy.map(([field, , label, fallback]) =>
+          area(label, 'nodes.' + id + '.' + field, pn[field] ?? fallback)).join('') +
+        '<div class="fl-note">В тексте можно использовать {price} для цены и {members} для числа участников.</div>';
     } else if (kind === 'external') {
       var en = S.nodes[id];
       h += fld('URL при первом открытии', 'nodes.' + id + '.url', en.url) +
@@ -1099,8 +1112,7 @@
     if (kind === 'payment') {
       o.price = n.price || '100 ₽'; o.members = n.members || '10';
       o.successDelay = milliseconds(n.successDelay,6000);
-      o.noteTpl = n.noteTpl || 'Тестовый заказ';
-      o.doneTpl = n.doneTpl || 'Тестовый заказ оформлен';
+      for (const [field, , , fallback] of paymentCopy) o[field] = n[field] ?? fallback;
     }
     S.nodes[id] = o;
   }
@@ -1127,8 +1139,7 @@
     if (kind === 'external') { delete n.auto; n.url = ''; n.repeatUrl = ''; }
     if (kind === 'payment') {
       n.price = '100 ₽'; n.members = '10'; n.successDelay = 6000;
-      n.noteTpl = 'Тестовый заказ';
-      n.doneTpl = 'Тестовый заказ оформлен';
+      for (const [field, , , fallback] of paymentCopy) n[field] = fallback;
     }
     if (kind === 'modal') {
       delete n.auto;

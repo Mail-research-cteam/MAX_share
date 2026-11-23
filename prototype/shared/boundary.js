@@ -26,7 +26,7 @@
   if(target.closest('#flow,.prototype-boundary'))return false;
   if(!target.closest('.app'))return false;
   if(target.matches('.nav-item'))return ['Звонки','Контакты'].includes(target.textContent.trim());
-  return target.matches('.tb-btn,.wb-ico,.wb-voice,.list-add,.list-search,.contact-act[aria-label="Написать сообщение"]')||
+  return target.matches('.tb-btn,.wb-ico,.wb-voice,.list-add,.list-search,.pay-promo-btn,.contact-act[aria-label="Написать сообщение"]')||
     !!target.closest('.pay-overlay a,.chat-scroll a');
  }
  document.addEventListener('click',function(e){

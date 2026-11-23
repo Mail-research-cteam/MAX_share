@@ -1073,7 +1073,7 @@ body.is-editing.view-split #flow .fl-viewport{right:400px}
   background:var(--pay-accent);color:#fff;
   font-weight:500;font-size:16px;line-height:20px;letter-spacing:.15px;
 }
-.pay-btn b{font-weight:700}
+.pay-btn span{white-space:normal;overflow-wrap:anywhere}
 .pay-btn:hover{filter:brightness(1.06)}
 .pay-btn:active{filter:brightness(.94)}
 .pay-consent{display:none}
@@ -1167,7 +1167,7 @@ body.is-editing.view-split #flow .fl-viewport{right:400px}
   .pay-price{padding:0 16px 8px}
   .pay-cell{padding:0 16px}
   .pay-cta{padding:24px 16px 8px}
-  .pay-btn{height:48px;border-radius:10px}
+  .pay-btn{min-height:48px;height:auto;border-radius:10px}
   .pay-consent{
     display:block;padding:0 16px 14px;
     font-size:13px;line-height:16px;color:var(--pay-text-secondary);
@@ -1335,3 +1335,5 @@ body.is-editing.view-split #flow .fl-viewport{right:400px}
 }
 
 .fl-bar{flex-wrap:wrap;flex:0 0 auto;height:auto;min-height:48px;max-height:35vh;padding:8px 10px;overflow:auto}.author-status{font:12px sans-serif}.author-error{color:#b42318}.author-select{max-width:160px}body.is-editing .app, .fl-viewport{top:var(--author-toolbar-height,48px)}.fl-port:focus-visible{outline:3px solid #0077ff;outline-offset:3px}dialog{max-width:90vw;border:1px solid #ddd;border-radius:10px;padding:20px}dialog select{max-width:65vw}
+
+.pay-title,.pay-price span,.pay-consent,.pay-legal p,.pay-success h3,.pay-success p,.pay-note{white-space:pre-wrap;overflow-wrap:anywhere}

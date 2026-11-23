@@ -15,7 +15,7 @@
   let count=0;function inspect(v,depth=0){if(depth>24||++count>150000)throw Error('Слишком сложные данные сценария');if(v&&typeof v==='object')for(const [key,item]of Object.entries(v)){if(['__proto__','prototype','constructor'].includes(key))throw Error('Недопустимое имя поля');inspect(item,depth+1);}else if(typeof v==='string'&&v.length>2*1024*1024)throw Error('Слишком длинное значение');}
   inspect(s);
   const nodes=Object.entries(s.nodes);if(nodes.length>1000)throw Error('Сценарий должен содержать не более 1000 узлов');
-  const stringFields=['name','text','message','title','sub','caption','time','auto','target','confirmLabel','cancelLabel','confirmTarget','cancelTarget','url','repeatUrl','noteTpl','doneTpl','contactSource','status','statusMobile','statusDesktop','date'];
+  const stringFields=['name','text','message','title','sub','caption','time','auto','target','confirmLabel','cancelLabel','confirmTarget','cancelTarget','url','repeatUrl','noteTpl','doneTpl','payLabel','payConsent','payLegal','successTitle','successText','contactSource','status','statusMobile','statusDesktop','date'];
   function strings(o){for(const key of stringFields)if(o[key]!=null&&typeof o[key]!=='string')throw Error('Поле '+key+' должно быть текстом');}
   strings(s.header);strings(s.intro);strings(s.intro.card);
   if(s.header.avatar!=null&&!image(s.header.avatar))throw Error('Некорректный аватар бота');
