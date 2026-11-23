@@ -10,7 +10,7 @@ class Target{
  addEventListener(type,fn){if(!this.listeners.has(type))this.listeners.set(type,[]);this.listeners.get(type).push(fn);}
  emit(type,options={}){const e={target:this,ctrlKey:false,metaKey:false,altKey:false,shiftKey:false,deltaX:0,deltaY:0,deltaMode:0,clientX:250,clientY:200,defaultPrevented:false,preventDefault(){this.defaultPrevented=true;},...options};for(const fn of this.listeners.get(type)||[])fn(e);return e;}
 }
-const document=new Target(),window=new Target(),flow=new Target(['#flow']),viewport=new Target([],flow),area=new Target(['textarea'],viewport),select=new Target(['select'],viewport),input=new Target(['input'],viewport),editable=new Target(['[contenteditable]:not([contenteditable="false"])'],viewport),app=new Target(['.app']),modal=new Target(['#shareModal']),previewField=new Target(['input'],app),tool=new Target([],flow);
+const document=new Target(),window=new Target(),flow=new Target(['#flow']),viewport=new Target([],flow),area=new Target(['textarea'],viewport),select=new Target(['select'],viewport),input=new Target(['input'],viewport),editable=new Target(['[contenteditable]:not([contenteditable="false"])'],viewport),app=new Target(['.app']),modal=new Target(['#shareModal'],app),previewField=new Target(['input'],app),tool=new Target([],flow);
 let editing=true,time=1000,timers=new Map(),timer=0;
 document.body={classList:{contains:()=>editing}};
 let view={pan:{x:40,y:20},zoom:1},cancels=0;

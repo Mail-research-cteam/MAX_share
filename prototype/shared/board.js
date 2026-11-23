@@ -179,9 +179,9 @@
       else{if(!drag.moved&&Math.hypot(dx,dy)<3)return;if(!drag.moved){drag.moved=true;}const z=api.view().zoom;for(const p of drag.positions){const o=api.pos(p.id),el=layer.querySelector(`[data-id="${p.id}"]`);el.style.left=Math.round(p.x+dx/z)+'px';el.style.top=Math.round(p.y+dy/z)+'px';}api.draw();}
     });
     window.addEventListener('pointerup',e=>{if(captured!==null&&e.pointerId!==captured)return;if(link){const r=bounds(),inside=link.moved&&e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom,over=inside?linkTarget():null;const key=link.key,moved=link.moved,v=api.view(),point=over?api.inputPos(over.dataset.id,world(local(pointer),v.pan,v.zoom)):null;cancel();if(!moved){if(api.edges().some(e=>e[0]===key))select(key);return;}if(over&&!['meta','intro'].includes(over.dataset.kind)&&point){api.snapshot();target(api.state(),key,over.dataset.id);(api.state()._boardInputSides ||= {})[key]={target:over.dataset.id,side:point.side};api.rebuild();api.sync();api.save();info.textContent='Связь создана.';}else info.textContent='Соединение отменено. Прежняя связь сохранена.';return;}if(drag?.type==='node'&&drag.moved){const end=drag.positions.map(p=>({id:p.id,x:layer.querySelector('[data-id="'+p.id+'"]').offsetLeft,y:layer.querySelector('[data-id="'+p.id+'"]').offsetTop}));const changed=end.some((p,i)=>p.x!==drag.positions[i].x||p.y!==drag.positions[i].y);for(const p of drag.positions){api.pos(p.id).x=p.x;api.pos(p.id).y=p.y;}if(changed){api.snapshot();for(const p of end){api.pos(p.id).x=p.x;api.pos(p.id).y=p.y;}api.save();}drag.moved=false;}cancel();refresh();});
-    // One router owns desktop gestures, including preview dialogs portalled to body.
+    // One router owns desktop gestures across the board and preview.
     // No mouse/trackpad guessing: plain wheel pans; explicit zoom modifiers zoom.
-    const previewSelector='.app,#shareModal,[data-preview-region]';
+    const previewSelector='.app,[data-preview-region]';
     let wheelOwner=null,wheelAt=0,gesture=null,gestureTimer=0,gestureTail=0,pointerOwner=null;
     const idle=100; // wheel has no sequence ID: short inactivity boundary, reset by a click.
     function region(e){

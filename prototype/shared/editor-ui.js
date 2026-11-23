@@ -85,8 +85,6 @@ window.MaxEditorUI={
     select.addEventListener('change',render);new MutationObserver(render).observe(select,{childList:true,subtree:true,characterData:true});commands.forEach(b=>{b.className='scenario-option scenario-command';b.tabIndex=-1;const handler=b.onclick;b.onclick=e=>{close(true);return handler.call(b,e);};});context.append(trigger,list);render();
   },
   install(){
-    // Escape preview containment; CSS confines this layer to the bot's rectangle.
-    document.body.append(document.getElementById('shareModal'));
     const bar=document.querySelector('.fl-bar'),flow=document.getElementById('flow');bar.classList.add('editor-toolbar');
     bar.querySelector('b')?.remove();bar.querySelectorAll('.fl-sep,.fl-grow').forEach(el=>el.remove());
     const removed=['Сохранить версию + JSON','Импорт JSON / HTML','Комплект ZIP','Открыть сохранённую версию','Предыдущая сохранённая','Файловая версия'];
