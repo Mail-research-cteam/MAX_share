@@ -391,7 +391,6 @@ p{margin:0}
 }
 .botcard-avatar{position:relative;width:72px;height:72px;flex:0 0 72px}
 .botcard-avatar img.photo{width:72px;height:72px;border-radius:50%;object-fit:cover}
-.botcard-avatar img.ring{position:absolute;inset:0;width:72px;height:72px}
 .botcard-text{display:flex;flex-direction:column;gap:var(--sp-s);width:100%}
 .botcard-name{
   font-family:var(--font-common);font-weight:500;text-align:center;

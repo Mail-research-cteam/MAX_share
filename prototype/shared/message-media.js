@@ -5,11 +5,13 @@ window.MaxMessageMedia=(()=>{
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function valid(image){return MaxSafety.image(image);}
  async function verify(scenario){
-  const seen=new Map();for(const node of Object.values(scenario.nodes))if(node.image){
-   if(!valid(node.image))throw Error('Некорректное изображение');
-   let dimensions=seen.get(node.image.src);
-   if(!dimensions){const img=new Image();img.src=node.image.src;try{await img.decode();}catch{throw Error('Изображение повреждено или не поддерживается.');}dimensions={width:img.naturalWidth,height:img.naturalHeight};seen.set(node.image.src,dimensions);img.removeAttribute('src');}
-   if(dimensions.width!==node.image.width||dimensions.height!==node.image.height)throw Error('Размеры изображения не совпадают с данными файла.');
+  const seen=new Map();
+  const images=[scenario.header.avatar,...Object.values(scenario.nodes).map(node=>node.image)];
+  for(const image of images)if(image!=null){
+   if(!valid(image))throw Error('Некорректное изображение');
+   let dimensions=seen.get(image.src);
+   if(!dimensions){const img=new Image();img.src=image.src;try{await img.decode();}catch{throw Error('Изображение повреждено или не поддерживается.');}dimensions={width:img.naturalWidth,height:img.naturalHeight};seen.set(image.src,dimensions);img.removeAttribute('src');}
+   if(dimensions.width!==image.width||dimensions.height!==image.height)throw Error('Размеры изображения не совпадают с данными файла.');
   }
  }
  function fileData(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(Error('Не удалось прочитать файл. Попробуйте ещё раз.'));r.readAsDataURL(file);});}
@@ -32,12 +34,13 @@ window.MaxMessageMedia=(()=>{
   }
   return {src,name:file.name,width,height};
  }
- function field(id,image){
+ function field(id,image,noun='картинку'){
   const has=valid(image),key='message-image-'+id;
-  return '<div class="fl-media-field" data-media-field="'+esc(id)+'"><label class="fl-media-drop" for="'+esc(key)+'" tabindex="0" role="button" aria-label="'+(has?'Заменить картинку':'Добавить картинку')+'">'+
+  const action=(has?'Заменить ':'Добавить ')+noun,remove='Удалить '+noun;
+  return '<div class="fl-media-field" data-media-field="'+esc(id)+'"><label class="fl-media-drop" for="'+esc(key)+'" tabindex="0" role="button" aria-label="'+action+'">'+
    (has?'<img class="fl-media-thumb" src="'+esc(image.src)+'" width="'+image.width+'" height="'+image.height+'" alt="">':'<span class="editor-icon" aria-hidden="true">'+MaxIcons.plus+'</span>')+
-   '<span>'+(has?'Заменить картинку':'Добавить картинку')+'</span></label><input type="file" hidden id="'+esc(key)+'" data-media-file="'+esc(id)+'" accept="image/png,image/jpeg,image/webp,image/gif">'+
-   (has?'<div class="fl-media-details"><span>'+esc(image.name||'Изображение')+'</span><button class="fl-x" type="button" data-media-remove="'+esc(id)+'" aria-label="Удалить картинку" title="Удалить картинку">'+MaxIcons.trash+'</button></div>':'')+
+   '<span>'+action+'</span></label><input type="file" hidden id="'+esc(key)+'" data-media-file="'+esc(id)+'" accept="image/png,image/jpeg,image/webp,image/gif">'+
+   (has?'<div class="fl-media-details"><span>'+esc(image.name||'Изображение')+'</span><button class="fl-x" type="button" data-media-remove="'+esc(id)+'" aria-label="'+remove+'" title="'+remove+'">'+MaxIcons.trash+'</button></div>':'')+
    '<p class="fl-media-error" id="'+esc(key)+'-error" role="alert"></p></div>';
  }
  function picture(node,id){return valid(node.image)?'<button type="button" class="message-image" data-message-image="'+esc(id)+'" aria-label="Открыть изображение"><img src="'+esc(node.image.src)+'" width="'+node.image.width+'" height="'+node.image.height+'" alt="Изображение в сообщении" draggable="false"></button>':'';}

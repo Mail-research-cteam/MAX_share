@@ -106,11 +106,10 @@
      «Чат с контактом» — шапку и ленту. Живёт в сценарии (S.contacts), поэтому
      правится в редакторе и попадает в скачанный файл.
      ══════════════════════════════════════════════════════════════════════ */
-  var BOT_AVATAR = '';
-  (function () {
-    var a = $('.tb-avatar img');
-    if (a) BOT_AVATAR = a.getAttribute('src') || '';
-  })();
+  var defaultBotAvatar = $('.tb-avatar img').getAttribute('src');
+  function botAvatar() {
+    return S.header.avatar?.src || defaultBotAvatar;
+  }
 
   // Заголовок окна выбора контакта зафиксирован макетом и не настраивается.
   var PICK_TITLE = 'Переслать сообщение';
@@ -227,6 +226,7 @@
     if (botCell) {
       var lastId = botLastId();
       botCell.querySelector('.cell-name').textContent = S.header.name || '';
+      botCell.querySelector('.cell-avatar img').setAttribute('src', botAvatar());
       var bm = botCell.querySelector('.cell-msg');
       if (bm) bm.textContent = nodePreview(lastId);
       botCell.classList.toggle('is-selected', activeChat === 'bot');
@@ -269,7 +269,7 @@
       $('.tb-name').textContent = h.name || '';
       $('.st-mobile').textContent = h.statusMobile || '';
       $('.st-desktop').textContent = h.statusDesktop || '';
-      if (ava && BOT_AVATAR) ava.setAttribute('src', BOT_AVATAR);
+      if (ava) ava.setAttribute('src', botAvatar());
     }
     renderChatList(pc);
   }
@@ -287,6 +287,7 @@
 
   function botCard(card) {
     var n = tpl('tpl-botcard');
+    n.querySelector('.botcard-avatar img').setAttribute('src', botAvatar());
     n.querySelector('[data-bind="cardName"]').textContent = card.name || '';
     n.querySelector('[data-bind="cardCaption"]').textContent = card.caption || '';
     return n;
@@ -748,7 +749,8 @@
     if (kind === 'meta') {
       h += fld('Имя бота', 'header.name', S.header.name) +
         fld('Подпись на мобильной', 'header.statusMobile', S.header.statusMobile) +
-        fld('Подпись на десктопе', 'header.statusDesktop', S.header.statusDesktop);
+        fld('Подпись на десктопе', 'header.statusDesktop', S.header.statusDesktop) +
+        MaxMessageMedia.field('__meta', S.header.avatar, 'аватар');
     } else if (kind === 'intro') {
       h += fld('Дата (капсула)', 'intro.date', S.intro.date) +
         fld('Имя в карточке', 'intro.card.name', S.intro.card.name) +
@@ -955,13 +957,17 @@
     board.repair(false,pendingPlacement.splice(0).concat(duplicates));
 
     var typingSnap = 0;
-    MaxMessageMedia.installEditor({layer:layer,getNode:function(id){return S.nodes[id];},commit:function(id,image){
-      var node=S.nodes[id];if(!node||!['bot','user','person_chat'].includes(node.type))return;
-      var next=clone(S);if(image)next.nodes[id].image=image;else delete next.nodes[id].image;
+    MaxMessageMedia.installEditor({layer:layer,getNode:function(id){return id==='__meta' ? S.header : S.nodes[id];},commit:function(id,image){
+      var isAvatar=id==='__meta';
+      var target=isAvatar ? S.header : S.nodes[id];
+      if(!target||(!isAvatar&&!['bot','user','person_chat'].includes(target.type)))return;
+      var field=isAvatar ? 'avatar' : 'image';
+      var next=clone(S),nextTarget=isAvatar ? next.header : next.nodes[id];
+      if(image)nextTarget[field]=image;else delete nextTarget[field];
       // Check persistence before mutating the current scenario or undo history.
-      try{localStorage.setItem(STORE+':base',JSON.stringify(DEFAULT));localStorage.setItem(STORE,JSON.stringify(next));}
+      if(!window.MaxStandalone)try{localStorage.setItem(STORE+':base',JSON.stringify(DEFAULT));localStorage.setItem(STORE,JSON.stringify(next));}
       catch(e){throw Error('Не удалось сохранить картинку: в браузере недостаточно места. Выберите изображение поменьше.');}
-      snapshot();typingSnap=0;if(image)node.image=image;else delete node.image;
+      snapshot();typingSnap=0;if(image)target[field]=image;else delete target[field];
       buildGraph();syncPreview();save();
       var label=layer.querySelector('[data-media-field="'+id+'"] .fl-media-drop');if(label)label.focus({preventScroll:true});
     }});
@@ -1265,7 +1271,7 @@
       else if ($('#payOverlay').classList.contains('is-open')) closePay();
     });
 
-    imageViewer = MaxMessageMedia.installViewer({feed:feed,getNode:function(id){return S.nodes[id];},author:function(node){return {name:node.type==='bot'?S.header.name:'Вы',avatar:node.type==='bot'?($('.tb-avatar img')||{}).src||'':'',date:S.intro.date||''};}});
+    imageViewer = MaxMessageMedia.installViewer({feed:feed,getNode:function(id){return S.nodes[id];},author:function(node){return {name:node.type==='bot'?S.header.name:'Вы',avatar:node.type==='bot'?botAvatar():'',date:S.intro.date||''};}});
     if (!/[?&]edit(=1)?(&|$)/.test(window.MaxStandalone?.search??location.search)) return;
 
     document.body.classList.add('is-editing');

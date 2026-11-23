@@ -18,6 +18,7 @@
   const stringFields=['name','text','message','title','sub','caption','time','auto','target','confirmLabel','cancelLabel','confirmTarget','cancelTarget','url','repeatUrl','noteTpl','doneTpl','contactSource','status','statusMobile','statusDesktop','date'];
   function strings(o){for(const key of stringFields)if(o[key]!=null&&typeof o[key]!=='string')throw Error('Поле '+key+' должно быть текстом');}
   strings(s.header);strings(s.intro);strings(s.intro.card);
+  if(s.header.avatar!=null&&!image(s.header.avatar))throw Error('Некорректный аватар бота');
   if(s.contacts!=null&&(!Array.isArray(s.contacts)||s.contacts.length>1000))throw Error('Некорректный справочник контактов');
   const contacts=new Set();for(const c of s.contacts||[]){if(!record(c)||!identifier(c.id)||contacts.has(c.id))throw Error('Некорректный или повторяющийся ID контакта');contacts.add(c.id);strings(c);if(c.avatar!=null&&(typeof c.avatar!=='string'||(c.avatar&&!url(c.avatar,true))))throw Error('Некорректный адрес аватара');}
   for(const [id,n]of nodes){
