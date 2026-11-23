@@ -17,7 +17,6 @@
 
 <div class="app">
 
-  <!-- ═══ Navigation Panel · Figma 1:22550 · только ≥768px ═══ -->
   <nav class="nav-rail" aria-label="Основная навигация">
     <div class="nav-group">
       <button class="nav-item is-active" type="button">
@@ -60,7 +59,6 @@
     </div>
   </nav>
 
-  <!-- ═══ Secondary Panel · Figma 1:22551 · только ≥972px ═══ -->
   <aside class="chat-list-panel" aria-label="Список чатов">
     <div class="list-topbar">
       <div class="list-title-row">
@@ -77,12 +75,7 @@
       </div>
     </div>
 
-    <!-- В макете 9 строк, но 8 из них — инстансы одного компонента .Cell P2P.
-         Реальный контент по MCP получен только для двух: 1:22554 (выбранная,
-         бот) и 1:22558 (Cell Chat). Остальные строки не выдуманы намеренно —
-         подставляются данными из API. -->
     <div class="chat-list">
-      <!-- .Cell P2P (выбранная, 1:22554) -->
       <button class="cell is-selected" type="button" id="cellBot">
         <span class="cell-avatar">
           <img class="avatar" src="assets/demo-avatar.svg" alt="">
@@ -108,7 +101,6 @@
     </div>
   </aside>
 
-  <!-- ═══ ЧАТ · QT+WEB 1:22563 / Chat-bot Mobile 1:22607 ═══ -->
   <main class="chat">
 
     <header class="chat-topbar">
@@ -150,7 +142,6 @@
 
     <div class="chat-scroll"></div>
 
-    <!-- Write Bar · 1:22592 (деск) / 1:22642 (моб) -->
     <div class="writebar">
       <div class="wb-card">
         <div class="wb-field">
@@ -171,7 +162,6 @@
       </div>
     </div>
   </main>
-  <!-- ══ ОКНО ОПЛАТЫ · Checkout · Midas (4:126048 / 4:122618) ══ -->
   <div class="pay-overlay" id="payOverlay" role="dialog" aria-modal="true" aria-labelledby="payTitle">
     <div class="pay" id="payCard">
       <div class="pay-head">
@@ -213,7 +203,6 @@
         </div>
         <p class="pay-consent">Деньги не списываются</p>
 
-        <!-- Успешное состояние (4:122618 / 4:132686) -->
         <div class="pay-success">
           <svg class="pay-check" aria-hidden="true" focusable="false" width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M28 4C41.2548 4 52 14.7452 52 28C52 41.2548 41.2548 52 28 52C14.7452 52 4 41.2548 4 28C4 14.7452 14.7452 4 28 4ZM28 7C16.402 7 7 16.402 7 28C7 39.598 16.402 49 28 49C39.598 49 49 39.598 49 28C49 16.402 39.598 7 28 7ZM36.9393 20.9393C37.5251 20.3536 38.4749 20.3536 39.0607 20.9393C39.6464 21.5251 39.6464 22.4749 39.0607 23.0607L25.0607 37.0607C24.4749 37.6464 23.5251 37.6464 22.9393 37.0607L15.9393 30.0607C15.3536 29.4749 15.3536 28.5251 15.9393 27.9393C16.5251 27.3536 17.4749 27.3536 18.0607 27.9393L24 33.8787L36.9393 20.9393Z" fill="#4BB34B"/></svg>
           <h3>Оплачено</h3>
@@ -225,7 +214,6 @@
         </div>
       </div>
 
-      <!-- Нижний тост есть только в мобильном макете успеха (4:132686) -->
       <div class="pay-note" id="payDoneNote">Тестовый заказ оформлен</div>
 
     </div>
@@ -282,7 +270,6 @@
   </div>
 </div>
 
-<!-- ═══ Модалка «Поделитесь телефоном?» · 1:25442 / 1:25452 ═══ -->
 
 
 <!-- Шаблоны сообщений: разметка с ассетами живёт здесь,

@@ -1,88 +1,4 @@
 
-/* ══════════════════════════════════════════════════════════════════════════
-   ЧАТ-БОТ — адаптивная сборка по макетам Figma
-   Фреймы: Chat-bot (1:22549, 1280×800) · Chat-bot Mobile (1:22607, 375×852)
-           modal (1:25437 → карточка 1:25452) · modal mobile (1:25439 → 1:25442)
-
-   ──────────────────────────────────────────────────────────────────────────
-   ШАГ 3. ЧТО РЕАЛЬНО МЕНЯЕТСЯ МЕЖДУ МОБИЛЬНОЙ И ДЕСКТОПНОЙ ВЕРСИЯМИ
-   ──────────────────────────────────────────────────────────────────────────
-   1. ПОЯВЛЯЮТСЯ/ПРОПАДАЮТ БЛОКИ
-      · Navigation Panel — рельс 76px слева. Только десктоп.
-      · Secondary Panel — список чатов 356px. Только десктоп.
-      · Правые действия шапки: мобильная — 1 иконка (доп. меню);
-        десктоп — 3 (звонок, видеозвонок, поиск).
-      · Подпись под именем: мобильная «бот» (11/14), десктоп «В сети» (12/16, themed).
-
-   2. НАПРАВЛЕНИЕ FLEX / КОЛОНКИ
-      · Мобильная — одна колонка: шапка / лента / врайтбар.
-      · Десктоп — три колонки по горизонтали: рельс (76, fixed) +
-        список (356, fixed) + чат (flex, min-width 540 по токену из макета).
-      · Внутри врайтбара порядок иконок инвертируется:
-        мобильная [эмодзи · инпут · скрепка] + микрофон СНАРУЖИ пилюли;
-        десктоп  [скрепка · инпут · эмодзи · стикер · микрофон] ВНУТРИ карточки.
-        Сделано через `order`, а не через две разные вёрстки.
-
-   3. ОТСТУПЫ И ФОРМА ВРАЙТБАРА
-      · Мобильная: врайтбар во всю ширину, белый, тень сверху, инпут r12.
-      · Десктоп: плавающая карточка, отступы 16px по бокам, r16, Elevation 3.
-
-   4. КЕГЛЬ (масштабируется через clamp(), а не скачком)
-      · Капсула даты: 13/18 (моб) → 14/18 (деск)
-      · Имя в карточке бота: 14/20 → 15/20
-      · Описание в карточке: 12/16 → 13/16
-      · Инициалы в контакте: 13/18 → 14/18
-      · Аватар в шапке: 36 → 40
-      Тело сообщений (17/22) и кнопки бота (16/20) одинаковые — не трогаем.
-
-   5. ШИРИНА ПУЗЫРЕЙ
-      · Мобильная: max-width 291px (токен Size/Bubble/Max Width).
-      · Десктоп: входящий тянется, оставляя справа «карман» 352px
-        (в макете ряд имеет pr-352 при ширине 848 → 41.5%).
-        Реализовано как min(352px, 41.5%) — тянется плавно.
-
-   6. БРЕЙКПОИНТЫ — откуда взяты
-      Ширины фреймов (375 / 1280) — это контрольные точки, а не переключатели.
-      Реальные пороги считаются из min-width, зашитых в компоненты макета:
-        · Top Bar Chat / Desktop и QT+WEB имеют min-width 540px;
-        · рельс 76px, список 356px — фиксированные.
-      → 76 + 540 = 616  ⇒ рельс физически помещается от ~640px;
-      → 76 + 356 + 540 = 972 ⇒ список помещается ровно с 972px.
-      Отсюда:
-        --bp-rail: 768px  (рельс + десктопная шапка + плавающий врайтбар)
-        --bp-list: 972px  (появляется список чатов)
-
-      ⚠️ ДОПУЩЕНИЕ (в макетах промежуточного состояния нет):
-      диапазон 768–971px — «планшетный» режим: десктопная шапка и врайтбар
-      уже есть, списка чатов ещё нет. Порог 768 выбран как ближайший
-      стандартный ≥616. Если по продуктовой логике рельс должен появляться
-      вместе со списком — достаточно поднять --bp-rail до 972px.
-
-   ──────────────────────────────────────────────────────────────────────────
-   ОСОЗНАННЫЕ ОТСТУПЛЕНИЯ ОТ МАКЕТА (не додумано молча)
-   ──────────────────────────────────────────────────────────────────────────
-   A. КОНТЕНТ ЛЕНТЫ. Мокапы показывают разные наборы демо-данных:
-      мобильный — 1 входящий пузырь с 10 кнопками бота + вторая капсула
-      «10 марта»; десктопный — 2 входящих пузыря по 2 кнопки, одна капсула.
-      Это разница демо-контента, а не адаптива. Взят десктопный набор как
-      канонический (полнее описывает сценарий «поделиться номером»).
-   B. ХВОСТИКИ ПУЗЫРЕЙ. В Figma форма пузыря задана маской (mask image).
-      Здесь — border-radius по токенам: Regular 16, Stack Corner 6,
-      Above Bot Action 6. Визуально эквивалентно, но устойчивее в вёрстке.
-   C. АВАТАРЫ. В макете — squircle-маска, здесь border-radius: 50%.
-   D. ТРИГГЕР МОДАЛКИ. Явной кнопки «Поделиться номером» в интерфейсе бота
-      в макетах нет (кнопки подписаны «Кнопка 1…10»); при этом у пузыря в
-      Figma есть состояние с именем «Поделиться номером» — исходящая
-      карточка контакта. Модалку открывает первая кнопка бота, подписи
-      кнопок оставлены как в макете.
-   E. АССЕТЫ. Все иконки/аватары/паттерн — родные из Figma MCP (домен
-      figma.com/api/mcp/asset/...). Плейсхолдеров нет.
-      ⚠️ Эти ссылки живут ~7 дней. Перед продакшеном — переэкспортировать
-      и положить локально; имена переменных ниже соответствуют слоям Figma.
-   F. ШРИФТЫ. Roboto и Inter подключены с Google Fonts. «SF Pro Text» в вебе
-      недоступен — используется системный стек -apple-system с фоллбэком
-      на Roboto (как в самом макете для не-Apple платформ).
-   ══════════════════════════════════════════════════════════════════════════ */
 
 /* ─── Токены: 1-в-1 из get_variable_defs, без значений «на глаз» ─────────── */
 :root{
@@ -176,7 +92,6 @@
   --font-common:-apple-system,'SF Pro Text','Roboto',system-ui,sans-serif;
   --font-inter:'Inter',system-ui,-apple-system,sans-serif;
 
-  /* Font styles (Figma → CSS) */
   --fs-header:24px;      --lh-header:28px;      --ls-header:0px;
   --fs-body:16px;        --lh-body:20px;        --ls-body:.15px;
   --fs-body-strong:16px; --lh-body-strong:20px; --ls-body-strong:.15px;
@@ -221,8 +136,6 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 img{display:block;max-width:100%}
-/* Инлайн-иконки из Figma. Монохром переведён на currentColor — цвет
-   задаётся токеном на контейнере, а не зашит в путь. */
 svg.ico{display:block;flex:0 0 auto}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 p{margin:0}
@@ -246,7 +159,6 @@ p{margin:0}
   .app.is-chat-list>.nav-rail{display:none}
 }
 
-/* ─── 1. Navigation Panel (Figma 1:22550) — десктоп ─────────────────────── */
 .nav-rail{
   display:none;
   flex:0 0 var(--nav-rail-w);
@@ -274,7 +186,6 @@ p{margin:0}
 .nav-divider{margin:var(--sp-s) 0;height:1px;background:var(--divider-secondary)}
 .nav-spacer{flex:1 0 8px;min-height:8px}
 
-/* ─── 2. Secondary Panel — список чатов (Figma 1:22551) — десктоп ───────── */
 .chat-list-panel{
   display:none;
   flex:0 0 var(--chat-list-w);
@@ -284,7 +195,6 @@ p{margin:0}
   border-right:.5px solid var(--divider-secondary);
   overflow:hidden;
 }
-/* Top Bar Section Chat / Desktop (1:22552) */
 .list-topbar{padding:var(--sp-l) 0 var(--sp-s);flex:0 0 auto}
 .list-title-row{
   display:flex;align-items:center;gap:var(--sp-m);
@@ -317,7 +227,6 @@ p{margin:0}
   color:var(--text-mute);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-/* Chat List (1:22553) */
 .chat-list{flex:1 1 auto;overflow-y:auto;padding-top:var(--sp-s)}
 .cell{
   display:flex;gap:var(--sp-m);align-items:flex-start;
@@ -365,9 +274,6 @@ p{margin:0}
 .cell-msg-author{display:flex;align-items:center;gap:var(--sp-xs);min-width:0}
 .cell-msg-author img{width:20px;height:20px;border-radius:50%;object-fit:cover;flex:0 0 20px}
 
-/* ══════════════════════════════════════════════════════════════════════════
-   3. ЧАТ (Figma: QT+WEB 1:22563 / Chat-bot Mobile 1:22607)
-   ══════════════════════════════════════════════════════════════════════════ */
 .chat{
   flex:1 1 auto;min-width:0;
   display:flex;flex-direction:column;
@@ -443,7 +349,6 @@ p{margin:0}
 .tb-btn.act-mobile{color:var(--topbar-icon-primary)}
 .tb-btn.act-desktop{display:none;color:var(--icon-primary)}
 
-/* ─── Лента сообщений (chat-content 1:22565) ────────────────────────────── */
 .chat-scroll{
   flex:1 1 auto;min-height:0;
   display:flex;flex-direction:column;
@@ -456,7 +361,6 @@ p{margin:0}
    justify-content:flex-end в скроллящемся флекс-контейнере обрезает верх. */
 .chat-scroll > *:first-child{margin-top:auto}
 
-/* System Capsule (1:22566) */
 .capsule-row{
   display:flex;justify-content:center;
   padding:var(--sp-xs) var(--sp-m);
@@ -473,7 +377,6 @@ p{margin:0}
   color:var(--capsule-text);white-space:nowrap;
 }
 
-/* .number_request — карточка бота (1:22567) */
 .botcard-row{display:flex;justify-content:center;padding:var(--sp-xs) var(--sp-m)}
 .botcard{
   width:262px;min-width:262px;max-width:312px;
@@ -551,7 +454,6 @@ p{margin:0}
 .bubble.out .msg-time{color:var(--bubble-out-time)}
 .msg-time img,.msg-time svg{width:16px;height:16px;color:currentColor}
 
-/* Bot Actions (1:10485) */
 .bot-actions{
   display:flex;flex-direction:column;align-items:center;gap:var(--sp-2xs);
   padding-top:var(--sp-2xs);
@@ -574,7 +476,6 @@ p{margin:0}
 .bot-btn:hover{filter:brightness(1.08)}
 .bot-btn:active{filter:brightness(.94)}
 
-/* Исходящая карточка контакта (состояние «Поделиться номером», 1:10553) */
 .contact{
   display:flex;align-items:center;gap:var(--sp-s);
   max-width:var(--size-bubble-max-20);padding-top:var(--sp-2xs);
@@ -760,12 +661,6 @@ input.wb-input:focus-visible{box-shadow:inset 0 -1px var(--text-themed)}
   .chat-list-panel{display:flex}
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   МОДАЛКА «Поделитесь телефоном?» (1:25442 моб / 1:25452 деск)
-   Один компонент; десктоп = мобильный ×1.2 (--modal-scale).
-   В ОБОИХ макетах это центрированный диалог, не bottom sheet — проверено:
-   моб. карточка 343×170 при x=16, y=321 в кадре 375×812 → по центру.
-   ══════════════════════════════════════════════════════════════════════════ */
 .modal-overlay{
   position:fixed;inset:0;z-index:100;
   display:flex;align-items:center;justify-content:center;
@@ -1043,12 +938,6 @@ body.is-editing.view-split #flow .fl-viewport{right:400px}
 /* Исходящее текстовое сообщение (в макетах его не было — собрано из токенов) */
 .bubble.out .msg-text{color:var(--bubble-out-text)}
 
-/* ══════════════════════════════════════════════════════════════════════════
-   SNACKBAR «Ссылка скопирована» (Figma  · 4:1657)
-   Десктоп — снизу слева, поверх списка чатов, как в макете.
-   Мобильная — во всю ширину над врайтбаром (в макете мобильной версии нет,
-   поэтому положение над клавиатурным баром — решение по платформенной норме).
-   ══════════════════════════════════════════════════════════════════════════ */
 .toast{
   position:absolute;z-index:90;
   left:var(--sp-m);right:var(--sp-m);bottom:76px;
@@ -1247,9 +1136,6 @@ body.is-editing.view-split #flow .fl-viewport{right:400px}
 .pay-legal p{margin:0}
 .pay-legal a,.pay-promo-txt b{color:var(--pay-link)}
 
-/* ══════════════════════════════════════════════════════════════════════════
-   Мобильная адаптация (4:132748 / 4:132686): шторка снизу.
-   ══════════════════════════════════════════════════════════════════════════ */
 @container app (max-width:767.98px){
   /* На мобильной окно занимает весь экран: белая часть прижата к верху и
      тянется до серой, серая — по низу и фиксированной высоты. */
@@ -1308,12 +1194,6 @@ body.is-editing.view-split #flow .fl-viewport{right:400px}
   *{transition-duration:.01ms !important;animation-duration:.01ms !important}
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   ЛПР → ПОДЕЛИТЬСЯ ССЫЛКОЙ
-   1) «Выбор контакта» — модалка поверх чата (fade+modal / modal page 424×686)
-   2) «Чат с контактом» — личный чат с выбранным человеком в том же интерфейсе
-   Значения размеров и типографики — из Figma-экспорта «список контактов.css».
-   ══════════════════════════════════════════════════════════════════════════ */
 
 /* ─── 1. Модальное окно «Выбор контакта» ────────────────────────────────── */
 .pick-overlay{
